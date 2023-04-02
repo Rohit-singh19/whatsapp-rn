@@ -2,7 +2,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 
 const ContactListScreen = () => {
-  // fetch the contact list from device
+  // fetch the contact list from device .
   return (
     <View>
       <Text>AllContact</Text>
