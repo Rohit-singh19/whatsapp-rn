@@ -7,7 +7,12 @@ import {COLORS} from '../Utils/theme';
 
 const StatusListScreen = () => {
   return (
-    <View style={{flex: 1, position: 'relative'}}>
+    <View
+      style={{
+        flex: 1,
+        position: 'relative',
+        backgroundColor: COLORS.secondary,
+      }}>
       <SectionList
         sections={[
           ...status,

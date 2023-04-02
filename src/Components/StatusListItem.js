@@ -99,6 +99,9 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 18,
   },
+  time: {
+    color: 'gray',
+  },
   encryptedText: {
     marginTop: 10,
     borderTopColor: COLORS.primary,

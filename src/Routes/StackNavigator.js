@@ -8,6 +8,7 @@ import HeaderLeft from '../Components/HeaderLeft';
 // icons
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ContactListScreen from '../Screens/ContactListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -114,6 +115,51 @@ function StackNavigator() {
           }}
           name="Chat"
           component={ChatScreen}
+        />
+
+        <Stack.Screen
+          options={({navigation, route: {params}}) => {
+            return {
+              headerBackTitleVisible: true,
+              headerTitle: () => (
+                <HeaderLeft name={'Select contact'} createdAt={new Date()} />
+              ),
+              headerRight: () => {
+                return (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <MaterialIcons
+                      size={25}
+                      color={COLORS.secondary}
+                      style={{
+                        marginRight: 15,
+                      }}
+                      name="videocam"
+                    />
+                    <MaterialIcons
+                      size={25}
+                      color={COLORS.secondary}
+                      style={{
+                        marginRight: 15,
+                      }}
+                      name="call"
+                    />
+                    <MaterialIcons
+                      size={25}
+                      color={COLORS.secondary}
+                      name="more-vert"
+                    />
+                  </View>
+                );
+              },
+            };
+          }}
+          name="Allcontact"
+          component={ContactListScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -7,7 +7,12 @@ import {COLORS} from '../Utils/theme';
 
 const CallListScreen = () => {
   return (
-    <View style={{flex: 1, paddingHorizontal: 10}}>
+    <View
+      style={{
+        flex: 1,
+        paddingHorizontal: 10,
+        backgroundColor: COLORS.secondary,
+      }}>
       <SectionList
         sections={[
           {

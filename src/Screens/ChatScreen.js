@@ -23,8 +23,8 @@ const ChatScreen = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 90}
-      style={styles.bg}>
-      <ImageBackground source={bg} style={styles.bg}>
+      style={[styles.bg]}>
+      <ImageBackground source={bg} style={[styles.bg]}>
         <FlatList
           data={chatMsg}
           renderItem={({item}) => <Message {...item} />}
@@ -32,6 +32,7 @@ const ChatScreen = () => {
           inverted
           showsVerticalScrollIndicator={false}
           style={styles.list}
+          contentContainerStyle={{paddingBottom: 20}}
         />
         <InputBox onChange={handleChange} onSend={onSend} />
       </ImageBackground>

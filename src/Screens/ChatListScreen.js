@@ -4,10 +4,18 @@ import chatList from '../modals/chatList';
 import ChatListItem from '../Components/ChatListItem';
 import {COLORS} from '../Utils/theme';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
 
 const ChatListScreen = () => {
+  const navigation = useNavigation();
+
   return (
-    <View style={{flex: 1, position: 'relative'}}>
+    <View
+      style={{
+        flex: 1,
+        position: 'relative',
+        backgroundColor: COLORS.secondary,
+      }}>
       <FlatList
         data={[
           ...chatList,
@@ -31,7 +39,12 @@ const ChatListScreen = () => {
         contentInsetAdjustmentBehavior="automatic"
       />
       <View style={styles.myFabWrapper}>
-        <MaterialIcons size={30} style={styles.chat} name="chat" />
+        <MaterialIcons
+          onPress={() => navigation.navigate('Allcontact')}
+          size={30}
+          style={styles.chat}
+          name="chat"
+        />
       </View>
     </View>
   );

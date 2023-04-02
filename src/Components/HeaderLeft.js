@@ -10,13 +10,15 @@ dayjs.extend(relativeTime);
 const HeaderLeft = ({name, image, createdAt}) => {
   return (
     <View style={styles.container}>
-      <Image
-        source={{
-          uri: image,
-        }}
-        resizeMode="contain"
-        style={styles.img}
-      />
+      {image && (
+        <Image
+          source={{
+            uri: image,
+          }}
+          resizeMode="contain"
+          style={styles.img}
+        />
+      )}
       <View style={styles.content}>
         <Text numberOfLines={1} style={styles.name}>
           {name}

@@ -25,6 +25,7 @@ const InputBox = ({handleChange, onSend}) => {
         style={styles.input}
         onChange={e => onChange(e)}
         placeholder="Message"
+        placeholderTextColor={'lightgray'}
       />
       <Ionicons
         onPress={() => handleSend()}
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     marginRight: 10,
+    color: COLORS.primary,
 
     shadowColor: '#000',
     shadowOffset: {
