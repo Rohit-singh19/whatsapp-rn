@@ -4,6 +4,7 @@ import CallListScreen from '../Screens/CallListScreen';
 import ChatListScreen from '../Screens/ChatListScreen';
 import StatusListScreen from '../Screens/StatusListScreen';
 import {COLORS} from '../Utils/theme';
+import {View} from 'react-native';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -31,7 +32,7 @@ function MainTabNavigator() {
       }}>
       <Tab.Screen
         options={{
-          tabBarIcon: () => <Badge coutner={3} />,
+          tabBarIcon: () => <Badge coutner={1} />,
         }}
         name="Chats"
         component={ChatListScreen}

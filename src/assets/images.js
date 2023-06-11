@@ -1,3 +1,4 @@
-const bg = require('./defaultChatBg.png');
+import bg from './defaultChatBg.png';
+import bg1 from './bg1.png';
 
-export {bg};
+export {bg, bg1};

@@ -11,6 +11,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import ContactListScreen from '../Screens/ContactListScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import WelcomeScreen from '../Screens/WelcomeScreen';
+import OtpScreen from '../Screens/OtpScreen';
+import RequestScreen from '../Screens/RequestScreen';
+import ProfileScreen from '../Screens/ProfileScreen';
+import InitializingScreen from '../Screens/InitializingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,9 +28,14 @@ function StackNavigator() {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
+            animation: 'fade_from_bottom',
           }}>
           <Stack.Screen name="welcome" component={WelcomeScreen} />
           <Stack.Screen name="login" component={LoginScreen} />
+          <Stack.Screen name="otp" component={OtpScreen} />
+          <Stack.Screen name="requestScreen" component={RequestScreen} />
+          <Stack.Screen name="profile" component={ProfileScreen} />
+          <Stack.Screen name="initialize" component={InitializingScreen} />
         </Stack.Navigator>
       ) : (
         // on LogIn

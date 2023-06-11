@@ -7,4 +7,7 @@ export const COLORS = {
   tealGreenDark: '#075E54',
   blue: '#34B7F1',
   msgColor: '#DCF8C5',
+  jetBlack: '#343434',
+  licorice: '#1B1212',
+  gray: '#808080',
 };
