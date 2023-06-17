@@ -19,7 +19,7 @@ import InitializingScreen from '../Screens/InitializingScreen';
 const Stack = createNativeStackNavigator();
 
 function StackNavigator() {
-  let isLoggedIn = false;
+  let isLoggedIn = true;
 
   return (
     <NavigationContainer>

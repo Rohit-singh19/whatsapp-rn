@@ -1,2 +1,6 @@
 # whatsapp-rn
-WhatsApp clone 
+
+WhatsApp clone
+
+need to push the code on git
+commit is already done
