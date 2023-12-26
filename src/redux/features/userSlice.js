@@ -10,6 +10,7 @@ const initialState = {
   isVerifiedUser: false,
   userData: null,
   userError: null,
+  isLoggedIn: false,
 };
 
 const userSlice = createSlice({
@@ -24,11 +25,13 @@ const userSlice = createSlice({
       state.isUserLoading = false;
       state.isVerifiedUser = true;
       state.userData = payload;
+      state.isLoggedIn = true;
     },
     errorUser: (state, {payload}) => {
       state.isUserLoading = false;
       state.isVerifiedUser = false;
       state.userError = payload;
+      state.isLoggedIn = false;
     },
     verifiedUser: (state, {payload}) => {
       state.isVerifiedUser = payload;

@@ -27,10 +27,8 @@ const RequestScreen = ({navigation}) => {
   };
 
   const handleContinue = async () => {
-    console.log('working');
     if (Platform.OS === 'android') {
       // Handle permission request for Android
-      console.log('working...');
       try {
         const permissions = [
           PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
@@ -106,13 +104,7 @@ const RequestScreen = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}>
+        <View style={styles.backDrop}>
           <View style={styles.modalView}>
             <View style={styles.topContainer}>
               <MaterialCommunityIcons
@@ -130,13 +122,7 @@ const RequestScreen = ({navigation}) => {
                 WhatsApp access to your contacts and your device's photos,
                 media, and files.
               </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-end',
-                  marginTop: 20,
-                  gap: 20,
-                }}>
+              <View style={styles.actionCont}>
                 <Pressable onPress={handleNotNow}>
                   <Text style={styles.btnTxt}>Not Now</Text>
                 </Pressable>
@@ -186,5 +172,17 @@ const styles = StyleSheet.create({
   btnTxt: {
     color: COLORS.primaryGreen,
     fontSize: 16,
+  },
+  backDrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  actionCont: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+    gap: 20,
   },
 });

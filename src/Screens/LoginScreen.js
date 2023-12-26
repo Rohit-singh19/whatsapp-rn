@@ -6,19 +6,49 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback, useContext} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {COLORS} from '../Utils/theme';
+import auth from '@react-native-firebase/auth';
+import {AuthenticationContext} from '../Context/Authentication/AuthenticationProvider';
 
 const LoginScreen = ({navigation}) => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const {setConfirmation} = useContext(AuthenticationContext);
 
-  function handleNext() {
-    if (!phoneNumber)
+  const onAuthStateChanged = useCallback(user => {
+    if (user) {
+      // console.log(user);
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber;
+  }, [onAuthStateChanged]);
+
+  const handleNext = useCallback(() => {
+    if (!phoneNumber) {
       return Alert.alert('Phone Number', 'Please provide the Phone Number!');
+    }
 
     if (phoneNumber.length !== 10) {
       return Alert.alert('Incorrect', 'Incorrect Phone Number!');
+    }
+
+    // signIn with Phone Number
+    async function handleVerify() {
+      try {
+        const confirmation = await auth().signInWithPhoneNumber(
+          `+91 ${phoneNumber}`,
+        );
+        // console.log('confirmation:::', confirmation);
+        setConfirmation(confirmation);
+        navigation.navigate('otp', {phoneNumber});
+      } catch (err) {
+        console.log('err on verifying:::', err);
+        Alert.alert('Error', "It's not you, It's Us!");
+      }
     }
 
     Alert.alert(
@@ -34,10 +64,11 @@ const LoginScreen = ({navigation}) => {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => navigation.navigate('otp', {phoneNumber})},
+        {text: 'OK', onPress: () => handleVerify()},
       ],
     );
-  }
+  }, [navigation, phoneNumber, setConfirmation]); // setConfirmation
+
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -53,7 +84,7 @@ const LoginScreen = ({navigation}) => {
           <View style={styles.algnRow}>
             <TextInput
               value="+91"
-              style={[styles.input, {flex: 0.2}]}
+              style={[styles.input, styles.countryInput]}
               placeholder={'India'}
             />
             <TextInput
@@ -61,7 +92,7 @@ const LoginScreen = ({navigation}) => {
               onChangeText={text => {
                 setPhoneNumber(text);
               }}
-              style={[styles.input, {flex: 0.8, textAlign: 'left'}]}
+              style={[styles.input, styles.phoneInput]}
               placeholder={'phone number'}
               autoFocus={true}
               keyboardType={'phone-pad'}
@@ -135,4 +166,8 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     fontSize: 18,
   },
+  countryInput: {
+    flex: 0.2,
+  },
+  phoneInput: {flex: 0.8, textAlign: 'left'},
 });

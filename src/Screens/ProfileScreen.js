@@ -9,16 +9,32 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import React, {useState, useEffect, useRef} from 'react';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useContext,
+} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {COLORS} from '../Utils/theme';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import EmojiPicker from 'rn-emoji-keyboard';
+import CustomUploadImage from '../Components/CustomUploadImage';
+import {AuthenticationContext} from '../Context/Authentication/AuthenticationProvider';
 
 const ProfileScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState('');
+  const [isEmojiOpen, setEmojiOpen] = useState(false);
+  const [imageURI, setImageURI] = useState('');
+
+  const [uploadingProgress, setUploadingProgress] = useState(0);
+
+  const {setUserDetails} = useContext(AuthenticationContext);
 
   const emojiInputRef = useRef(null);
 
@@ -28,10 +44,11 @@ const ProfileScreen = ({navigation}) => {
     }
   };
 
-  const handleEmojiButtonPress = () => {
+  const handleEmojiButtonPress = useCallback(() => {
     Keyboard.dismiss(); // Dismiss the keyboard if it's open
+    setEmojiOpen(true);
     focusEmojiInput(); // Focus the emoji input to show the emoji keyboard
-  };
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
@@ -39,18 +56,66 @@ const ProfileScreen = ({navigation}) => {
     }, 1000);
   }, []);
 
-  const handleNext = () => {
-    if (!name) return Alert.alert('', 'Please provide the name!');
-    navigation.navigate('initialize');
-  };
+  // on Submitting the form
+  const handleNext = useCallback(async () => {
+    try {
+      if (!name) {
+        return Alert.alert('', 'Please provide the name!');
+      }
+
+      let currentUser = auth().currentUser;
+
+      setIsLoading(true);
+      const storageRef = storage().ref(`profile_images/${currentUser.uid}.jpg`);
+
+      // Convert local file to Blob using fetch
+      const response = await fetch(imageURI);
+      const blob = await response.blob();
+
+      // Set up an event listener to track the upload progress
+      const uploadTask = storageRef.put(blob);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          // Handle progress here
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log(`Upload is ${progress}% done`);
+          setUploadingProgress(Math.floor(progress));
+        },
+        error => {
+          console.error('Error during upload:', error);
+          Alert.alert('Error', 'Failed to upload image. Please try again.');
+        },
+        async () => {
+          // Upload completed successfully, get the download URL
+          const downloadURL = await storageRef.getDownloadURL();
+
+          const {uid} = currentUser;
+
+          // Update local user details
+          setUserDetails(prev => ({
+            ...prev,
+            displayName: name,
+            photoURL: downloadURL,
+            uid,
+          }));
+
+          navigation.navigate('initialize');
+        },
+      );
+    } catch (err) {
+      console.log('error on the submitting the detail form:::', err);
+      setIsLoading(false);
+    }
+  }, [name, imageURI, navigation, setUserDetails]);
+
+  const onSelect = useCallback((select, url) => {
+    setImageURI(url);
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size={'large'} color={COLORS.primaryGreen} />
-        </View>
-      )}
-
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Profile info</Text>
         <Text style={styles.label}>
@@ -58,20 +123,14 @@ const ProfileScreen = ({navigation}) => {
         </Text>
 
         <View style={styles.cameraContainer}>
-          <TouchableOpacity style={styles.iconBtn}>
-            <MaterialCommunityIcons
-              name="camera-plus"
-              size={80}
-              color={'#98a7af'}
-            />
-          </TouchableOpacity>
+          <CustomUploadImage onSelect={onSelect} />
         </View>
 
         <View style={styles.inputContainer}>
           <TextInput
             ref={emojiInputRef}
             style={styles.input}
-            keyboardType="emoji"
+            // keyboardType="emoji"
             placeholder="Type your name here"
             placeholderTextColor={COLORS.gray}
             fontSize={18}
@@ -89,6 +148,23 @@ const ProfileScreen = ({navigation}) => {
         style={styles.btnContainer}>
         <Text style={styles.btnTxt}>Next</Text>
       </TouchableOpacity>
+
+      <EmojiPicker
+        open={isEmojiOpen}
+        onClose={() => setEmojiOpen(false)}
+        onEmojiSelected={({emoji}) => {
+          setName(prev => prev + emoji);
+        }}
+        enableSearchBar
+      />
+
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size={40} color={COLORS.primaryGreen} />
+
+          <Text style={styles.loadingTxt}>{uploadingProgress}%</Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -111,7 +187,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     justifyContent: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
   title: {
     textAlign: 'center',
@@ -158,5 +234,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: COLORS.secondary,
     fontSize: 18,
+  },
+  loadingTxt: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.primaryGreen,
   },
 });

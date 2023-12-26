@@ -9,7 +9,7 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {COLORS} from '../Utils/theme';
@@ -18,6 +18,8 @@ import {
   removeListener,
   startOtpListener,
 } from 'react-native-otp-verify';
+import auth from '@react-native-firebase/auth';
+import {AuthenticationContext} from '../Context/Authentication/AuthenticationProvider';
 
 const OtpScreen = ({
   route: {
@@ -27,10 +29,15 @@ const OtpScreen = ({
 }) => {
   const [otp, setOtp] = useState('');
   const [remainingTime, setRemainingTime] = useState(120);
-  // for verifying loading
 
+  const {confirmation, setConfirmation, setUserDetails} = useContext(
+    AuthenticationContext,
+  );
+
+  // for verifying loading
   const [isVerifying, setIsVerifying] = useState(false);
 
+  // count down
   useEffect(() => {
     const interval = setInterval(() => {
       setRemainingTime(prevTime => prevTime - 1);
@@ -48,12 +55,16 @@ const OtpScreen = ({
 
     startOtpListener(message => {
       // extract the otp using regex e.g. the below regex extracts 4 digit otp from message
-      if (!message) return;
-      const otpArr = /(\d{4})/g.exec(message);
+      if (!message) {
+        return;
+      }
+      const otpArr = /(\d{6})/g.exec(message);
 
-      if (!otpArr) return;
-      const otp = otpArr[1];
-      setOtp(otp);
+      if (!otpArr) {
+        return;
+      }
+      const retrievedOtp = otpArr[1];
+      setOtp(retrievedOtp);
     });
     return () => removeListener();
   }, []);
@@ -72,22 +83,54 @@ const OtpScreen = ({
     setOtp(text);
   };
 
-  const handleResend = () => {};
+  // Resend the OTP
+  const handleResend = useCallback(async () => {
+    try {
+      const resendConfirmation = await auth().signInWithPhoneNumber(
+        `+91 ${phoneNumber}`,
+      );
 
-  // on submiting the otp from keyboard or autofill
-  async function handleVerifyOtp() {
+      setConfirmation(resendConfirmation);
+    } catch (err) {
+      console.log('error on resending the OTP:::', err);
+      Alert.alert('Error', "Can't Send the OTP. Please try Again!");
+    }
+  }, [setConfirmation, phoneNumber]);
+
+  // on submitting the otp from keyboard or autofill
+  const handleVerifyOtp = useCallback(async () => {
     if (otp.length !== 6) {
       return Alert.alert('Invalid OTP', 'Please enter a 6-digit OTP.');
     }
 
     setIsVerifying(true);
 
-    setTimeout(() => {
-      // navigate to the access screen
+    try {
+      await confirmation.confirm(otp);
+
+      setUserDetails(prev => ({
+        ...prev,
+        phoneNumber: `+91 ${phoneNumber}`,
+      }));
+
       navigation.navigate('requestScreen');
       setIsVerifying(false);
-    }, 1000);
-  }
+    } catch (err) {
+      console.log('error on verifying OTP::', err);
+      Alert.alert('Invalid OTP', 'OTP code is not valid!');
+      setIsVerifying(false);
+      setOtp('');
+    }
+    // confirmation
+  }, [otp, navigation, confirmation, phoneNumber, setUserDetails]);
+
+  // Automatically verify the OTP
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerifyOtp(otp);
+    }
+  }, [otp, handleVerifyOtp]);
+
   return (
     <SafeAreaView style={styles.container}>
       {/* TOP */}
@@ -145,13 +188,7 @@ const OtpScreen = ({
 
       {isVerifying && (
         <Modal visible={isVerifying} animationType="slide" transparent={true}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}>
+          <View style={styles.backDrop}>
             <View style={styles.mainModal}>
               <ActivityIndicator size={'large'} color={COLORS.primaryGreen} />
               <Text style={styles.verifyingTxt}>Verifying...</Text>
@@ -239,5 +276,11 @@ const styles = StyleSheet.create({
   verifyingTxt: {
     fontSize: 18,
     color: COLORS.jetBlack,
+  },
+  backDrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });

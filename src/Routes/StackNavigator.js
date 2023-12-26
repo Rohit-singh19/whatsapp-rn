@@ -1,13 +1,10 @@
-import {View, Text} from 'react-native';
+import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ChatScreen from '../Screens/ChatScreen';
 import {COLORS} from '../Utils/theme';
 import MainTabNavigator from './MainTabNavigator';
 import HeaderLeft from '../Components/HeaderLeft';
-// icons
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ContactListScreen from '../Screens/ContactListScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import WelcomeScreen from '../Screens/WelcomeScreen';
@@ -15,28 +12,32 @@ import OtpScreen from '../Screens/OtpScreen';
 import RequestScreen from '../Screens/RequestScreen';
 import ProfileScreen from '../Screens/ProfileScreen';
 import InitializingScreen from '../Screens/InitializingScreen';
+import AuthenticationProvider from '../Context/Authentication/AuthenticationProvider';
+import {useSelector} from 'react-redux';
 
 const Stack = createNativeStackNavigator();
 
 function StackNavigator() {
-  let isLoggedIn = true;
+  const {isLoggedIn} = useSelector(state => state.userReducer);
 
   return (
     <NavigationContainer>
       {!isLoggedIn ? (
         // not loggedIn
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            animation: 'fade_from_bottom',
-          }}>
-          <Stack.Screen name="welcome" component={WelcomeScreen} />
-          <Stack.Screen name="login" component={LoginScreen} />
-          <Stack.Screen name="otp" component={OtpScreen} />
-          <Stack.Screen name="requestScreen" component={RequestScreen} />
-          <Stack.Screen name="profile" component={ProfileScreen} />
-          <Stack.Screen name="initialize" component={InitializingScreen} />
-        </Stack.Navigator>
+        <AuthenticationProvider>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              animation: 'fade_from_bottom',
+            }}>
+            <Stack.Screen name="welcome" component={WelcomeScreen} />
+            <Stack.Screen name="login" component={LoginScreen} />
+            <Stack.Screen name="otp" component={OtpScreen} />
+            <Stack.Screen name="requestScreen" component={RequestScreen} />
+            <Stack.Screen name="profile" component={ProfileScreen} />
+            <Stack.Screen name="initialize" component={InitializingScreen} />
+          </Stack.Navigator>
+        </AuthenticationProvider>
       ) : (
         // on LogIn
         <Stack.Navigator
@@ -49,52 +50,32 @@ function StackNavigator() {
             title: 'WhatsApp',
             headerTransparent: false,
 
-            // for search Icon
-            // headerSearchBarOptions: {
-            //   onChangeText: event => console.log(event.nativeEvent.text),
-            //   placeholder: 'search...',
-            //   textColor: COLORS.secondary,
-            //   headerIconColor: COLORS.secondary,
-            //   hintTextColor: COLORS.secondary,
-            //   shouldShowHintSearchIcon: false,
-            // },
+            // // for search Icon
+            headerSearchBarOptions: {
+              onChangeText: event => console.log(event.nativeEvent.text),
+              placeholder: 'Search...',
+              textColor: COLORS.secondary,
+              headerIconColor: COLORS.secondary,
+              hintTextColor: COLORS.secondary,
+              shouldShowHintSearchIcon: false,
+              headerBackVisible: true,
+              headerTransparent: false,
+              tintColor: COLORS.secondary,
+              disableBackButtonOverride: true,
+              borderRadius: 10,
+              // headerRight: () => (
+              //   <Ionicons
+              //     size={27}
+              //     color={COLORS.secondary}
+              //     style={{
+              //       marginRight: 10,
+              //     }}
+              //     name="camera-outline"
+              //   />
+              // ),
+            },
             // for screen animation
             animation: 'fade_from_bottom',
-            headerRight: () => {
-              return (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Ionicons
-                    size={27}
-                    color={COLORS.secondary}
-                    style={{
-                      marginRight: 10,
-                    }}
-                    name="camera-outline"
-                  />
-                  <MaterialIcons
-                    size={25}
-                    color={COLORS.secondary}
-                    style={{
-                      marginRight: 10,
-                    }}
-                    name="search"
-                  />
-                  <MaterialIcons
-                    size={25}
-                    color={COLORS.secondary}
-                    style={{
-                      marginRight: 10,
-                    }}
-                    name="more-vert"
-                  />
-                </View>
-              );
-            },
           }}>
           <Stack.Screen name="Home" component={MainTabNavigator} />
           <Stack.Screen
@@ -103,38 +84,6 @@ function StackNavigator() {
               return {
                 headerBackTitleVisible: true,
                 headerTitle: () => <HeaderLeft {...user} {...lastMessage} />,
-                headerRight: () => {
-                  return (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        style={{
-                          marginRight: 15,
-                        }}
-                        name="videocam"
-                      />
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        style={{
-                          marginRight: 15,
-                        }}
-                        name="call"
-                      />
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        name="more-vert"
-                      />
-                    </View>
-                  );
-                },
               };
             }}
             name="Chat"
@@ -148,38 +97,6 @@ function StackNavigator() {
                 headerTitle: () => (
                   <HeaderLeft name={'Select contact'} createdAt={new Date()} />
                 ),
-                headerRight: () => {
-                  return (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        style={{
-                          marginRight: 15,
-                        }}
-                        name="videocam"
-                      />
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        style={{
-                          marginRight: 15,
-                        }}
-                        name="call"
-                      />
-                      <MaterialIcons
-                        size={25}
-                        color={COLORS.secondary}
-                        name="more-vert"
-                      />
-                    </View>
-                  );
-                },
               };
             }}
             name="Allcontact"

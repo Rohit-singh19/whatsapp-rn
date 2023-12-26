@@ -1,10 +1,10 @@
+import React from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import Badge from '../Components/Badge';
 import CallListScreen from '../Screens/CallListScreen';
 import ChatListScreen from '../Screens/ChatListScreen';
 import StatusListScreen from '../Screens/StatusListScreen';
 import {COLORS} from '../Utils/theme';
-import {View} from 'react-native';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -32,21 +32,21 @@ function MainTabNavigator() {
       }}>
       <Tab.Screen
         options={{
-          tabBarIcon: () => <Badge coutner={1} />,
+          tabBarIcon: () => <Badge counter={1} />,
         }}
         name="Chats"
         component={ChatListScreen}
       />
       <Tab.Screen
         options={{
-          tabBarIcon: () => <Badge coutner={1} />,
+          tabBarIcon: () => <Badge counter={1} />,
         }}
         name="Status"
         component={StatusListScreen}
       />
       <Tab.Screen
         options={{
-          tabBarIcon: () => <Badge coutner={4} />,
+          tabBarIcon: () => <Badge counter={4} />,
         }}
         name="Calls"
         component={CallListScreen}
